@@ -1,23 +1,30 @@
 package com.ab.todo_application.login;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 public class LoginController {
-    Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    private AuthenticationServices authenticationServices;
 
-    @RequestMapping("/login")
-    public String login(@RequestParam String name, ModelMap model){
-        model.put("name", name);
-        logger.debug("Query Param {}",name);
-        logger.info("Query Param {}",name);
-        logger.warn("Query Param {}",name);
+    @RequestMapping(value="/login", method = RequestMethod.GET)
+    public String goToLoginPage(){
+        return "loginPage";
+    }
 
+    @RequestMapping(value="/login", method = RequestMethod.POST)
+    public String goToWelcomePage(@RequestParam String username, @RequestParam String password, ModelMap model){
+        if(authenticationServices.authenticate(username, password)){
+            model.put("username",username);
+            model.put("password",password);
+            return "welcomePage";
+        }
         return "loginPage";
     }
 }
